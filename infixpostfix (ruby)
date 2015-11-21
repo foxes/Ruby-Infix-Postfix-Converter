@@ -1,0 +1,182 @@
+class InfixPostfix
+
+ # converts the infix expression string to postfix expression and returns it
+ def infixToPostfix(exprStr)
+
+   postfix = "" #will hold new equation as it's being constructed
+   stack = []
+
+   exprStr.split(" ").each do |postfixbuffer| #splits equation by white space
+     postfixbuffer  = "" << postfixbuffer
+     case postfixbuffer
+       when "(" #could also use isLeftParen? here
+         stack.push postfixbuffer
+
+       when /[[:digit:]]/ #could also use operand? here
+         postfix += postfixbuffer + " " 
+       when "*", "/", "+", "-", "^", "%" #could also use operator? here
+         finished = false
+         until finished or stack.empty?
+           if inputPrecedence(postfixbuffer ) > stackPrecedence(stack.last())
+             finished = true
+           else
+             postfix += stack.pop + " "
+           end
+         end
+         stack.push postfixbuffer 
+
+       when ")" #could also use isRightParen? here
+         while stack.last() != "("
+           postfix += stack.pop + " "
+         end
+         stack.pop #removing parenthesis from stack
+     end
+   end
+
+   while !stack.empty? #adding all the left over stuff to the postfix equation
+     postfix += stack.pop + " "
+   end
+
+   return postfix[0...-1] #removing trailing white space that we added earlier
+
+ end
+
+
+ # evaluate the postfix string and returns the result
+ def evaluatePostfix(exprStr)
+
+   stack = []
+   exprStr.split(" ").each do |postfixbuffer| #splitting based on white space
+     if operand?(postfixbuffer)
+       stack.push(postfixbuffer.to_i) #if it's just a number..push to stack
+     elsif postfixbuffer == "+"
+       rightside = stack.pop
+       leftside = stack.pop
+       stack.push(leftside + rightside)
+     elsif postfixbuffer == "*"
+       rightside = stack.pop
+       leftside = stack.pop
+       stack.push(leftside * rightside)
+     elsif postfixbuffer == "-"
+       rightside = stack.pop
+       leftside = stack.pop
+       stack.push(leftside - rightside)
+     elsif postfixbuffer == "^"
+       rightside = stack.pop
+       leftside = stack.pop
+       stack.push(leftside ** rightside)
+     elsif postfixbuffer == "/"
+       rightside = stack.pop
+       leftside = stack.pop
+       stack.push(leftside / rightside)
+     elsif postfixbuffer == "%"
+       rightside = stack.pop
+       leftside = stack.pop
+       stack.push(leftside % rightside)
+     else
+
+     end
+   end
+
+   return stack.pop #the stack holds the new value
+
+
+ end
+
+ private # subsequent methods are private methods
+
+ # returns true if the input is an operator and false otherwise
+ def operator?(str)
+   case str
+     when "+", "-", "*", "/", "^"
+       return true
+     else
+       return false
+   end
+ end
+
+ # returns true if the input is an operand and false otherwise
+ def operand?(str)
+
+   str =~ /[[:digit:]]/
+ end
+
+ # returns true if the input is a left parenthesis and false otherwise
+ def isLeftParen?(str)
+   case str
+     when "("
+       return true
+     else
+       return false
+   end
+ end
+
+ # returns true if the input is a right parenthesis and false otherwise
+ def isRightParen?(str)
+   case str
+     when ")"
+       return true
+     else
+       return false
+   end
+ end
+ # returns the stack precedence of the input operator
+ def stackPrecedence(operator)
+   case operator
+     when "^"
+       3
+     when "*", "/"
+       2
+     when "+", "-"
+       1
+     when "("
+       0
+   end
+ end
+ # returns the input precedence of the input operator
+ def inputPrecedence(operator)
+   case operator
+     when "+", "-"
+       1
+     when "*", "/", "%"
+       2
+     when "^"
+       4
+     when "("
+       5
+   end
+ end
+
+
+ # applies the operators to num1 and num2 and returns the result
+ def applyOperator(num1, num2, operator)
+
+
+   if operator == "+"
+    buffer = num2 + num1
+   elsif operator == "*"
+     buffer = num2 * num1
+   elsif operator == "-"
+     buffer = num2 - num1
+   elsif operator == "^"
+     buffer = num2 ** num1
+   elsif operator == "/"
+     buffer = num2 / num1
+   elsif operator == "%"
+     buffer = num2 % num1
+   else
+   end
+   return buffer
+   end
+
+
+end
+#
+#  main driver for the program - similar to the main() function in Project 2
+#
+def main()
+
+end
+
+# invoke main function
+main()
